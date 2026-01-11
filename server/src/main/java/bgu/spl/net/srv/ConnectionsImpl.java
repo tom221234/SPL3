@@ -19,10 +19,11 @@ public class ConnectionsImpl<T> implements Connections<T> {
     // AtomicInteger for the next ID (thread safe)
     private AtomicInteger nextId = new AtomicInteger(0);
 
-    public void registerConnection(ConnectionHandler<T> handler) {
+    public int registerConnection(ConnectionHandler<T> handler) {
         int id = nextId.getAndIncrement();
         connections.put(id, handler);
         clientChannels.put(id, ConcurrentHashMap.newKeySet());
+        return id;
     }
 
     @Override
