@@ -130,7 +130,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
 
         int subscriptionId = Integer.parseInt(id);
 
-        connections.subscribe(connectionId, destination);
+        connections.subscribe(connectionId, destination, subscriptionId);
         subscriptionIdToChannel.put(subscriptionId, destination);
         channelToSubscriptionId.put(destination, subscriptionId);
 
@@ -193,6 +193,12 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
     private void handleDisconnect(Map<String, String> headers) {
         String receipt = headers.get("receipt");
 
+        // Send receipt BEFORE disconnecting (so handler still exists)
+        if (receipt != null) {
+            String response = "RECEIPT\nreceipt-id:" + receipt + "\n\n";
+            connections.send(connectionId, response);
+        }
+
         if (username != null) {
             synchronized (registeredUsers) {
                 loggedInUsers.remove(username);
@@ -200,26 +206,27 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
         }
 
         connections.disconnect(connectionId);
-
-        if (receipt != null) {
-            String response = "RECEIPT\nreceipt-id:" + receipt + "\n\n";
-            connections.send(connectionId, response);
-        }
-
         shouldTerminate = true;
     }
 
     private void sendMessageToChannel(String channel, String body, int messageId) {
-        Integer mySubId = channelToSubscriptionId.get(channel);
+        // Get all subscribers for this channel
+        java.util.Set<Integer> subscribers = connections.getSubscribers(channel);
+        if (subscribers == null) {
+            return;
+        }
 
-        String messageFrame = "MESSAGE\n" +
-                "subscription:" + (mySubId != null ? mySubId : 0) + "\n" +
-                "message-id:" + messageId + "\n" +
-                "destination:/" + channel + "\n" +
-                "\n" +
-                body;
-
-        connections.send(channel, messageFrame);
+        // Send personalized MESSAGE to each subscriber with THEIR subscription ID
+        for (Integer subscriberId : subscribers) {
+            int subId = connections.getSubscriptionId(subscriberId, channel);
+            String messageFrame = "MESSAGE\n" +
+                    "subscription:" + subId + "\n" +
+                    "message-id:" + messageId + "\n" +
+                    "destination:/" + channel + "\n" +
+                    "\n" +
+                    body;
+            connections.send(subscriberId, messageFrame);
+        }
     }
 
     private void sendError(String message, String receiptId) {
