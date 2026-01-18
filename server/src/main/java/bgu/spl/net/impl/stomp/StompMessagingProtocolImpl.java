@@ -105,9 +105,13 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
                 }
             } else {
                 registeredUsers.put(login, passcode);
+                // Record new user in database
+                SqlClient.registerUser(login, passcode);
             }
             loggedInUsers.put(login, connectionId);
             this.username = login;
+            // Record login in database
+            SqlClient.recordLogin(login);
         }
 
         String response = "CONNECTED\nversion:1.2\n\n";
@@ -133,6 +137,9 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
         connections.subscribe(connectionId, destination, subscriptionId);
         subscriptionIdToChannel.put(subscriptionId, destination);
         channelToSubscriptionId.put(destination, subscriptionId);
+
+        // Record subscription in database
+        SqlClient.recordSubscription(username, destination);
 
         if (receipt != null) {
             String response = "RECEIPT\nreceipt-id:" + receipt + "\n\n";
@@ -161,6 +168,9 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
         int messageId = messageIdCounter.getAndIncrement();
         sendMessageToChannel(destination, body, messageId);
 
+        // Record file upload in database (for report tracking)
+        SqlClient.recordFileUpload(username, "report", destination);
+
         if (receipt != null) {
             String response = "RECEIPT\nreceipt-id:" + receipt + "\n\n";
             connections.send(connectionId, response);
@@ -182,6 +192,8 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
         if (channel != null) {
             channelToSubscriptionId.remove(channel);
             connections.unsubscribe(connectionId, channel);
+            // Remove subscription from database
+            SqlClient.removeSubscription(username, channel);
         }
 
         if (receipt != null) {
@@ -203,6 +215,10 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
             synchronized (registeredUsers) {
                 loggedInUsers.remove(username);
             }
+            // Record logout in database
+            SqlClient.recordLogout(username);
+            // Remove all subscriptions from database
+            SqlClient.removeAllSubscriptions(username);
         }
 
         connections.disconnect(connectionId);

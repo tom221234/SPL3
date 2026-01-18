@@ -79,6 +79,17 @@ def init_database():
         )
     ''')
     
+    # Create subscriptions table
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS subscriptions (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL,
+            channel TEXT NOT NULL,
+            subscribe_time TEXT NOT NULL,
+            FOREIGN KEY (username) REFERENCES users(username)
+        )
+    ''')
+    
     conn.commit()
     conn.close()
     print(f"[{SERVER_NAME}] Database initialized: {DB_FILE}")
