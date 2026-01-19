@@ -65,7 +65,8 @@ std::string StompProtocol::createUnsubscribeFrame(const std::string &channel) {
 }
 
 std::string StompProtocol::createSendFrame(const std::string &channel,
-                                           const Event &event) {
+                                           const Event &event,
+                                           const std::string &filename) {
   std::stringstream ss;
   ss << "SEND\n";
   ss << "destination:/" << channel << "\n";
@@ -73,6 +74,7 @@ std::string StompProtocol::createSendFrame(const std::string &channel,
 
   // Body content - formatted as specified in assignment
   ss << "user: " << username << "\n";
+  ss << "source file: " << filename << "\n";
   ss << "team a: " << event.get_team_a_name() << "\n";
   ss << "team b: " << event.get_team_b_name() << "\n";
   ss << "event name: " << event.get_name() << "\n";
@@ -373,23 +375,23 @@ void StompProtocol::writeSummary(const std::string &gameName,
 
   outFile << "General stats:\n";
   for (const auto &pair : generalStats) {
-    outFile << "    " << pair.first << ": " << pair.second << "\n";
+    outFile << pair.first << ": " << pair.second << "\n";
   }
 
   outFile << teamA << " stats:\n";
   for (const auto &pair : teamAStats) {
-    outFile << "    " << pair.first << ": " << pair.second << "\n";
+    outFile << pair.first << ": " << pair.second << "\n";
   }
 
   outFile << teamB << " stats:\n";
   for (const auto &pair : teamBStats) {
-    outFile << "    " << pair.first << ": " << pair.second << "\n";
+    outFile << pair.first << ": " << pair.second << "\n";
   }
 
   outFile << "Game event reports:\n";
   for (const Event &event : sortedEvents) {
     outFile << event.get_time() << " - " << event.get_name() << ":\n";
-    outFile << event.get_discription() << "\n\n";
+    outFile << "\n" << event.get_discription() << "\n\n\n";
   }
 
   outFile.close();

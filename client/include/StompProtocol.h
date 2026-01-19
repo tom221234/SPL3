@@ -41,7 +41,7 @@ public:
                                  const std::string &password);
   std::string createSubscribeFrame(const std::string &channel);
   std::string createUnsubscribeFrame(const std::string &channel);
-  std::string createSendFrame(const std::string &channel, const Event &event);
+  std::string createSendFrame(const std::string &channel, const Event &event, const std::string &filename);
   std::string createDisconnectFrame();
 
   // Process received frames

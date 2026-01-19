@@ -1,41 +1,53 @@
-# 1. Clean Java server build
-cd /workspaces/Assignment\ 3\ SPL/server
-mvn clean
+# STOMP Client-Server Project
 
-# 2. Clean C++ client build  
-cd /workspaces/Assignment\ 3\ SPL/client
-make clean
+## ⚡ Quick Start
 
-# 3. Delete database (fresh start)
-rm /workspaces/Assignment\ 3\ SPL/data/stomp_server.db
+### 1. Build (First Time Only)
 
+**Server:**
+```bash
+cd /workspaces/Assignment\ 3\ SPL/server && mvn compile
+```
 
+**Client:**
+```bash
+cd /workspaces/Assignment\ 3\ SPL/client && make
+```
 
-# Build server
-cd /workspaces/Assignment\ 3\ SPL/server
-mvn compile
+### 2. Run (3 Terminals)
 
-# Build client
-cd /workspaces/Assignment\ 3\ SPL/client
-make
+**Terminal 1 - SQL Server:**
+```bash
+cd /workspaces/Assignment\ 3\ SPL/data && python3 sql_server.py 7778
+```
 
-# Start Python SQL (creates fresh database)
-cd /workspaces/Assignment\ 3\ SPL/data
-python3 sql_server.py 7778
+**Terminal 2 - STOMP Server:**
+```bash
+cd /workspaces/Assignment\ 3\ SPL/server && mvn exec:java -Dexec.mainClass="bgu.spl.net.impl.stomp.StompServer" -Dexec.args="7777 tpc"
+```
 
-# Start Java server (new terminal)
-cd /workspaces/Assignment\ 3\ SPL/server
-mvn exec:java -Dexec.mainClass="bgu.spl.net.impl.stomp.StompServer" -Dexec.args="7777 reactor"
+**Terminal 3 - Client:**
+```bash
+cd /workspaces/Assignment\ 3\ SPL/client && ./bin/StompWCIClient
+```
 
-# Start client (new terminal)
-cd /workspaces/Assignment\ 3\ SPL/client
-./bin/StompWCIClient
+---
 
-Client Commands - Complete Guide:
+## 📖 Client Commands
 
-login 127.0.0.1:7777 citam 123
+```text
+login 127.0.0.1:7777 user1 pass1
 join Germany_Japan
-exit Germany_Japan
 report data/events1_partial.json
-summary Germany_Japan citam output.txt
+summary Germany_Japan user1 output.txt
 logout
+```
+
+---
+
+## 🧹 Cleanup
+```bash
+cd /workspaces/Assignment\ 3\ SPL/server && mvn clean
+cd /workspaces/Assignment\ 3\ SPL/client && make clean
+rm -f /workspaces/Assignment\ 3\ SPL/data/stomp_server.db
+```

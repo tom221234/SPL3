@@ -24,6 +24,7 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
     // private maps for the specific client
     private Map<Integer, String> subscriptionIdToChannel = new HashMap<>();
     private Map<String, Integer> channelToSubscriptionId = new HashMap<>();
+    private java.util.Set<String> recordedFiles = new java.util.HashSet<>();  // Track files already logged
 
     @Override
     public void start(int connectionId, Connections<String> connections) {
@@ -165,8 +166,22 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
         int messageId = messageIdCounter.getAndIncrement();
         sendMessageToChannel(destination, body, messageId);
 
-        // Record file upload in database (for report tracking)
-        SqlClient.recordFileUpload(username, "report", destination);
+        // Parse source file from body for file tracking
+        String filename = "unknown";
+        String[] bodyLines = body.split("\n");
+        for (String line : bodyLines) {
+            if (line.startsWith("source file: ")) {
+                filename = line.substring(13).trim();
+                break;
+            }
+        }
+
+        // Record file upload in database (only once per file per session)
+        String fileKey = filename + ":" + destination;
+        if (!recordedFiles.contains(fileKey)) {
+            recordedFiles.add(fileKey);
+            SqlClient.recordFileUpload(username, filename, destination);
+        }
 
         if (receipt != null) {
             String response = "RECEIPT\nreceipt-id:" + receipt + "\n\n";

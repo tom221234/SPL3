@@ -249,7 +249,7 @@ int main(int argc, char *argv[]) {
 
         // Send each event as a SEND frame
         for (const Event &event : nae.events) {
-          std::string sendFrame = protocol->createSendFrame(gameName, event);
+          std::string sendFrame = protocol->createSendFrame(gameName, event, filePath);
 
           std::lock_guard<std::mutex> lock(mtx);
           if (!connectionHandler->sendFrameAscii(sendFrame, '\0')) {
