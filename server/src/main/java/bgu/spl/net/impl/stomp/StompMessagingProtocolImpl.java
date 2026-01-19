@@ -138,9 +138,6 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
         subscriptionIdToChannel.put(subscriptionId, destination);
         channelToSubscriptionId.put(destination, subscriptionId);
 
-        // Record subscription in database
-        SqlClient.recordSubscription(username, destination);
-
         if (receipt != null) {
             String response = "RECEIPT\nreceipt-id:" + receipt + "\n\n";
             connections.send(connectionId, response);
@@ -192,8 +189,6 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
         if (channel != null) {
             channelToSubscriptionId.remove(channel);
             connections.unsubscribe(connectionId, channel);
-            // Remove subscription from database
-            SqlClient.removeSubscription(username, channel);
         }
 
         if (receipt != null) {
@@ -217,8 +212,6 @@ public class StompMessagingProtocolImpl implements StompMessagingProtocol<String
             }
             // Record logout in database
             SqlClient.recordLogout(username);
-            // Remove all subscriptions from database
-            SqlClient.removeAllSubscriptions(username);
         }
 
         connections.disconnect(connectionId);

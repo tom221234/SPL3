@@ -99,34 +99,4 @@ public class SqlClient {
                 escape(username), escape(filename), getCurrentTimestamp(), escape(gameChannel));
         executeSql(sql);
     }
-
-    /**
-     * Record a channel subscription.
-     */
-    public static void recordSubscription(String username, String channel) {
-        String sql = String.format(
-                "INSERT INTO subscriptions (username, channel, subscribe_time) VALUES ('%s', '%s', '%s')",
-                escape(username), escape(channel), getCurrentTimestamp());
-        executeSql(sql);
-    }
-
-    /**
-     * Remove a channel subscription (when user unsubscribes).
-     */
-    public static void removeSubscription(String username, String channel) {
-        String sql = String.format(
-                "DELETE FROM subscriptions WHERE username = '%s' AND channel = '%s'",
-                escape(username), escape(channel));
-        executeSql(sql);
-    }
-
-    /**
-     * Remove all subscriptions for a user (when user disconnects).
-     */
-    public static void removeAllSubscriptions(String username) {
-        String sql = String.format(
-                "DELETE FROM subscriptions WHERE username = '%s'",
-                escape(username));
-        executeSql(sql);
-    }
 }
