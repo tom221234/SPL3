@@ -186,7 +186,7 @@ int main(int argc, char *argv[]) {
       readerThread = new std::thread(socketReaderThread);
     }
 
-    // ==================== JOIN ====================
+    //  join secition 
     else if (command == "join") {
       if (!isConnected) {
         std::cout << "Not connected. Please login first." << std::endl;
@@ -207,7 +207,7 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    // ==================== EXIT ====================
+    //  exit section
     else if (command == "exit") {
       if (!isConnected) {
         std::cout << "Not connected. Please login first." << std::endl;
@@ -228,7 +228,7 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    // ==================== REPORT ====================
+    // Report section 
     else if (command == "report") {
       if (!isConnected) {
         std::cout << "Not connected. Please login first." << std::endl;
@@ -262,7 +262,7 @@ int main(int argc, char *argv[]) {
       }
     }
 
-    // ==================== SUMMARY ====================
+    // summary section 
     else if (command == "summary") {
       if (tokens.size() < 4) {
         std::cout << "Usage: summary {game_name} {user} {file}" << std::endl;
@@ -277,7 +277,7 @@ int main(int argc, char *argv[]) {
       protocol->writeSummary(gameName, user, filePath);
     }
 
-    // ==================== LOGOUT ====================
+    // logout section 
     else if (command == "logout") {
       if (!isConnected) {
         std::cout << "Not connected. Please login first." << std::endl;
@@ -312,7 +312,7 @@ int main(int argc, char *argv[]) {
       std::cout << "Logged out successfully" << std::endl;
     }
 
-    // ==================== UNKNOWN COMMAND ====================
+    // unknown command section 
     else {
       std::cout << "Unknown command: " << command << std::endl;
       std::cout

@@ -42,27 +42,22 @@ public class SqlClient {
         }
     }
 
-    /**
-     * Get current timestamp formatted for SQL.
-     */
+    //Get current timestamp formatted for SQL.
     private static String getCurrentTimestamp() {
         return LocalDateTime.now().format(formatter);
     }
 
-    /**
-     * Escape single quotes in SQL strings to prevent SQL injection.
-     */
+    //Escape single quotes in SQL strings to prevent SQL injection.
+   
     private static String escape(String value) {
         if (value == null)
             return "";
         return value.replace("'", "''");
     }
 
-    // ==================== Convenience Methods ====================
+ 
 
-    /**
-     * Record a new user registration.
-     */
+    //Record a new user registration.
     public static void registerUser(String username, String password) {
         String sql = String.format(
                 "INSERT INTO users (username, password, registration_date) VALUES ('%s', '%s', '%s')",
@@ -70,9 +65,7 @@ public class SqlClient {
         executeSql(sql);
     }
 
-    /**
-     * Record a user login.
-     */
+    //Record a user login.
     public static void recordLogin(String username) {
         String sql = String.format(
                 "INSERT INTO login_history (username, login_time) VALUES ('%s', '%s')",
@@ -80,9 +73,7 @@ public class SqlClient {
         executeSql(sql);
     }
 
-    /**
-     * Record a user logout (update the latest login record without a logout time).
-     */
+    //Record a user logout (update the latest login record without a logout time).
     public static void recordLogout(String username) {
         String sql = String.format(
                 "UPDATE login_history SET logout_time = '%s' WHERE username = '%s' AND logout_time IS NULL",
@@ -90,9 +81,7 @@ public class SqlClient {
         executeSql(sql);
     }
 
-    /**
-     * Record a file upload via the report command.
-     */
+    //Record a file upload via the report command.
     public static void recordFileUpload(String username, String filename, String gameChannel) {
         String sql = String.format(
                 "INSERT INTO file_tracking (username, filename, upload_time, game_channel) VALUES ('%s', '%s', '%s', '%s')",
